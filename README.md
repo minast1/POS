@@ -31,12 +31,12 @@
 - Run "npm install" to install dependencies.
 - Run "npm run electron". 
 
-![POS](https://github.com/ailakhdar/Store-POS/screenshots/2.jpg)
+![POS](https://github.com/ailakhdar/Store-POS//tree/master/screenshots/2.jpg)
 
-![Transactions](https://github.com/ailakhdar/Store-POS/screenshots/transaction.jpg)
+![Transactions](https://github.com/ailakhdar/Store-POS//tree/master/screenshots/transaction.jpg)
 
-![Receipt](https://github.com/ailakhdar/Store-POS/screenshots/5.jpg)
+![Receipt](https://github.com/ailakhdar/Store-POS//tree/master/screenshots/5.jpg)
 
-![Permissions](https://github.com/ailakhdar/Store-POS/screenshots/4.jpg)
+![Permissions](https://github.com/ailakhdar/Store-POS//tree/master/screenshots/4.jpg)
 
-![Users](https://github.com/ailakhdar/Store-POS/screenshots/alert.jpg)
+![Users](https://github.com/ailakhdar/Store-POS//tree/master/screenshots/alert.jpg)
