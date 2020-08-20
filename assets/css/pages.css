@@ -36,7 +36,7 @@ color: #FFFFFF;
 
 #product_img {
   max-height: 80px;
-  border-radius: 50%;
+  /*border-radius: 50%;*/
   max-width: 100px;
 }
 
@@ -151,10 +151,10 @@ margin-right: 30px;
 .perms {
   display: none;
 }
-
+  
 #loading {
-  background: rgb(221,221,221);
-  background: radial-gradient(circle, rgba(153,153,153,1) 0%, rgba(221,221,221,1)  100%); 
+  background: #404040;
+  background-size: cover;
   position: absolute;
   height: 100%;
   width: 100%;
@@ -178,11 +178,11 @@ margin-right: 30px;
 
 #load {
   width: 500px;
-  margin: 300px auto;
-  border: 1px solid #ddd;
+  margin: 600px auto;
+  border: 1px solid #08C7E3;
   font-size: 16px;
   padding: 40px;
-  background: #f1f1f1;
+  background: #282828;
   color: #f2f8fb;
   border-radius: 8px;
 }
@@ -195,7 +195,7 @@ margin-right: 30px;
 }
 
 #total_sales { 
-  width: 100%;
+/* width: 100%; */
   color: #666;
   height: 120px;
   border: 1px solid #fff;
@@ -204,7 +204,7 @@ margin-right: 30px;
 }
 
 #total_transactions { 
-  width: 100%;
+  /* width: 100%; */
   color: #666;
   height: 120px;
   border: 1px solid #fff;
@@ -213,7 +213,7 @@ margin-right: 30px;
 }
 
 #total_items {   
-  width: 100%;
+  /* width: 100%; */
   color: #666;
   height: 120px;
   border: 1px solid #fff;
@@ -222,13 +222,22 @@ margin-right: 30px;
 }
 
 #total_products {   
-  width: 100%;
+  /* width: 100%; */
   color: #666;
   height: 120px;
   border: 1px solid #fff;
   border-radius: 5px;
   margin-bottom: 20px;
 }
+#total_profit {
+  /* width: 100%; */
+  color: #666;
+  height: 120px;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
 
 #totals h5 {
   text-align: center;

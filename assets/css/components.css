@@ -27,7 +27,7 @@
 .btn-default:focus,
 .btn-default:hover,
 .open > .dropdown-toggle.btn-default {
-  background-color: #5fbeaa !important;
+  background-color: #08C7E3 !important;
   border: 1px solid #5fbeaa !important;
 }
 .btn-white,
@@ -129,8 +129,12 @@
 .btn-warning:focus,
 .btn-warning:hover,
 .open > .dropdown-toggle.btn-warning {
-  background-color: #ffbd4a !important;
-  border: 1px solid #ffbd4a !important;
+  /*background-color: #000000 !important;*/
+  border: 1px solid #000000 !important;
+}
+.open > .dropdown-toggle.btn-warning :hover {
+  background-color: #FF0000 !important;
+  border: 1px solid #FF0000 !important;
 }
 .btn-danger,
 .btn-danger:active,
@@ -992,3 +996,8 @@ ul.ColVis_collection li {
   background-color: #fb6d9d;
 }
 
+.custom-btn {
+  font-size: 25px !important;
+   margin : 5px 
+  
+}

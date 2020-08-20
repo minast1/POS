@@ -25,6 +25,7 @@ let transaction_index;
 let host = 'localhost';
 let path = require('path');
 let port = '8001';
+let notiflix = require('notiflix');
 let moment = require('moment');
 let Swal = require('sweetalert2');
 let { ipcRenderer } = require('electron');
@@ -206,8 +207,40 @@ if (auth == undefined) {
                 });
 
                 allProducts = [...data];
-
                 loadProductList();
+                let delay = 0;
+                allProducts.forEach(product => {
+
+                    let todayDate = Date.now();
+                    let expDate = moment(product.expirationDate, "DD-MM-YYYY");
+                    const diffTime = Math.abs(expDate - todayDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if (diffDays <= 7 && diffDays > 2) {
+                        notiflix.Notify.Init({
+                            position: "right-bottom",
+                            cssAnimationDuration: 600,
+                            timeout: 4000 + delay,
+                            messageMaxLength: 150,
+                            cssAnimationStyle: "from-bottom"
+                        });
+                        notiflix.Notify.Warning(`${product.name} has only ${diffDays} day(s) left to expiry`);
+
+                    }
+                    else if (diffDays <= 2) {
+                        notiflix.Notify.Init({
+                            position: "right-bottom",
+                            cssAnimationDuration: 600,
+                            timeout: 8000 + delay * 2,
+                            messageMaxLength: 150,
+                            cssAnimationStyle: "from-bottom"
+                        });
+                        notiflix.Notify.Failure(`${product.name} has only ${diffDays} day(s) left to expiry`);
+                    }
+                    delay += 100;
+
+
+
+                })
 
                 $('#parent').text('');
                 $('#categories').html(`<button type="button" id="all" class="btn btn-categories btn-white waves-effect waves-light">All</button> `);
@@ -226,7 +259,7 @@ if (auth == undefined) {
                                         <div class="name" id="product_name">${item.name}</div> 
                                         <span class="sku">${item.sku}</span>
                                         <span class="stock">STOCK </span><span class="count">${item.stock == 1 ? item.quantity : 'N/A'}</span></div>
-                                        <sp class="text-success text-center"><b data-plugin="counterup">${settings.symbol + item.price}</b> </sp>
+                                        <sp class="text-success text-center"><b data-plugin="counterup">${item.price + " " + settings.symbol}</b> </sp>
                             </div>
                         </div>`;
                     $('#parent').append(item_info);
@@ -240,7 +273,7 @@ if (auth == undefined) {
 
                     $('#categories').append(`<button type="button" id="${category}" class="btn btn-categories btn-white waves-effect waves-light">${c.length > 0 ? c[0].name : ''}</button> `);
                 });
-
+                //possible alert position 
             });
 
         }
@@ -321,7 +354,6 @@ if (auth == undefined) {
                 cache: false,
                 processData: false,
                 success: function (data) {
-
                     if (data._id != undefined && data.quantity >= 1) {
                         $(this).addProductToCart(data);
                         $("#searchBarCode").get(0).reset();
@@ -398,6 +430,7 @@ if (auth == undefined) {
                 id: data._id,
                 product_name: data.name,
                 sku: data.sku,
+                profit: data.profit,
                 price: data.price,
                 quantity: 1
             };
@@ -430,13 +463,16 @@ if (auth == undefined) {
 
         $.fn.calculateCart = function () {
             let total = 0;
+            let ctotalProfit = 0;
             let grossTotal;
             $('#total').text(cart.length);
             $.each(cart, function (index, data) {
                 total += data.quantity * data.price;
+                ctotalProfit += data.quantity * data.profit;
             });
-            total = total - $("#inputDiscount").val();
-            $('#price').text(settings.symbol + total.toFixed(2));
+
+            //total = total - $("#inputDiscount").val();
+            $('#price').text(total.toFixed(2) + " " + settings.symbol);
 
             subTotal = total;
 
@@ -453,10 +489,10 @@ if (auth == undefined) {
                 grossTotal = total;
             }
 
-            orderTotal = grossTotal.toFixed(2);
+            orderTotal = total;
 
-            $("#gross_price").text(settings.symbol + grossTotal.toFixed(2));
-            $("#payablePrice").val(grossTotal);
+            // $("#gross_price").text(grossTotal.toFixed(2) + " " + settings.symbol);
+            $("#payablePrice").val(total);
         };
 
 
@@ -495,7 +531,7 @@ if (auth == undefined) {
                                 )
                             )
                         ),
-                        $('<td>', { text: settings.symbol + (data.price * data.quantity).toFixed(2) }),
+                        $('<td>', { text: (data.price * data.quantity).toFixed(2) }), //+ settings.symbol 
                         $('<td>').append(
                             $('<button>', {
                                 class: 'btn btn-danger btn-xs',
@@ -635,13 +671,14 @@ if (auth == undefined) {
 
             cart.forEach(item => {
 
-                items += "<tr><td>" + item.product_name + "</td><td>" + item.quantity + "</td><td>" + settings.symbol + parseFloat(item.price).toFixed(2) + "</td></tr>";
+                items += "<tr><td>" + item.product_name + "</td><td>" + item.quantity + "</td><td>" + parseFloat(item.price).toFixed(2) + " " + settings.symbol + "</td></tr>";
 
             });
 
             let currentTime = new Date(moment());
 
-            let discount = $("#inputDiscount").val();
+            //let discount = $("#inputDiscount").val();
+            let discount = 0;
             let customer = JSON.parse($("#customer").val());
             let date = moment(currentTime).format("YYYY-MM-DD HH:mm:ss");
             let paid = $("#payment").val() == "" ? "" : parseFloat($("#payment").val()).toFixed(2);
@@ -669,12 +706,12 @@ if (auth == undefined) {
                 payment = `<tr>
                         <td>Paid</td>
                         <td>:</td>
-                        <td>${settings.symbol + paid}</td>
+                        <td>${paid + " " + settings.symbol}</td>
                     </tr>
                     <tr>
                         <td>Change</td>
                         <td>:</td>
-                        <td>${settings.symbol + Math.abs(change).toFixed(2)}</td>
+                        <td>${Math.abs(change).toFixed(2) + " " + settings.symbol}</td>
                     </tr>
                     <tr>
                         <td>Method</td>
@@ -689,7 +726,7 @@ if (auth == undefined) {
                 tax_row = `<tr>
                     <td>Vat(${settings.percentage})% </td>
                     <td>:</td>
-                    <td>${settings.symbol}${parseFloat(totalVat).toFixed(2)}</td>
+                    <td>${parseFloat(totalVat).toFixed(2)} ${settings.symbol}</td>
                 </tr>`;
             }
 
@@ -758,7 +795,7 @@ if (auth == undefined) {
             <tr>                        
                 <td><b>Subtotal</b></td>
                 <td>:</td>
-                <td><b>${settings.symbol}${subTotal.toFixed(2)}</b></td>
+                <td><b>${subTotal.toFixed(2)} ${settings.symbol}</b></td>
             </tr>
             <tr>
                 <td>Discount</td>
@@ -772,7 +809,7 @@ if (auth == undefined) {
                 <td><h3>Total</h3></td>
                 <td><h3>:</h3></td>
                 <td>
-                    <h3>${settings.symbol}${parseFloat(orderTotal).toFixed(2)}</h3>
+                    <h3>${parseFloat(orderTotal).toFixed(2)} ${settings.symbol}</h3>
                 </td>
             </tr>
             ${payment == 0 ? '' : payment}
@@ -1238,11 +1275,12 @@ if (auth == undefined) {
             $("#category option").filter(function () {
                 return $(this).val() == allProducts[index].category;
             }).prop("selected", true);
-
+            $('#barcode').val(allProducts[index].barcode);
             $('#productName').val(allProducts[index].name);
             $('#product_price').val(allProducts[index].price);
             $('#quantity').val(allProducts[index].quantity);
-
+            $('#profit').val(allProducts[index].profit);
+            $('#expirationDate').val(allProducts[index].expirationDate);
             $('#product_id').val(allProducts[index]._id);
             $('#img').val(allProducts[index].img);
 
@@ -1496,7 +1534,7 @@ if (auth == undefined) {
             let counter = 0;
             $('#product_list').empty();
             $('#productList').DataTable().destroy();
-
+            let delay = 0;
             products.forEach((product, index) => {
 
                 counter++;
@@ -1506,11 +1544,12 @@ if (auth == undefined) {
                 });
 
 
+
                 product_list += `<tr>
             <td><img id="`+ product._id + `"></td>
             <td><img style="max-height: 50px; max-width: 50px; border: 1px solid #ddd;" src="${product.img == "" ? "./assets/images/default.jpg" : img_path + product.img}" id="product_img"></td>
             <td>${product.name}</td>
-            <td>${settings.symbol}${product.price}</td>
+            <td>${product.price} ${settings.symbol}</td>
             <td>${product.stock == 1 ? product.quantity : 'N/A'}</td>
             <td>${category.length > 0 ? category[0].name : ''}</td>
             <td class="nobr"><span class="btn-group"><button onClick="$(this).editProduct(${index})" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i></button><button onClick="$(this).deleteProduct(${product._id})" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button></span></td></tr>`;
@@ -1520,7 +1559,7 @@ if (auth == undefined) {
                     $('#product_list').html(product_list);
 
                     products.forEach(pro => {
-                        $("#" + pro._id + "").JsBarcode(pro._id, {
+                        $("#" + pro._id + "").JsBarcode(pro.barcode, {
                             width: 2,
                             height: 25,
                             fontSize: 14
@@ -1542,7 +1581,7 @@ if (auth == undefined) {
 
 
         function loadCategoryList() {
-
+            let products = [...allProducts];
             let category_list = '';
             let counter = 0;
             $('#category_list').empty();
@@ -1551,7 +1590,6 @@ if (auth == undefined) {
             allCategories.forEach((category, index) => {
 
                 counter++;
-
                 category_list += `<tr>
      
             <td>${category.name}</td>
@@ -1559,7 +1597,12 @@ if (auth == undefined) {
             });
 
             if (counter == allCategories.length) {
+                //------------------------------------------
 
+
+
+
+                //----------------------------------------
                 $('#category_list').html(category_list);
                 $('#categoryList').DataTable({
                     "autoWidth": false
@@ -1699,7 +1742,6 @@ if (auth == undefined) {
             e.preventDefault();
             let formData = $(this).serializeObject();
 
-            console.log(formData);
 
             if (ownUserEdit) {
                 if (formData.password != atob(user.password)) {
@@ -1755,7 +1797,7 @@ if (auth == undefined) {
 
 
                     }, error: function (data) {
-                        console.log(data);
+
                     }
 
                 });
@@ -1929,6 +1971,8 @@ function loadTransactions() {
     let tills = [];
     let users = [];
     let sales = 0;
+    let subProfit = 0;
+    let totalProfit = 0;
     let transact = 0;
     let unique = 0;
 
@@ -1947,19 +1991,23 @@ function loadTransactions() {
 
             $('#transaction_list').empty();
             $('#transactionList').DataTable().destroy();
-
+            // here the trans data 
             allTransactions = [...transactions];
 
             transactions.forEach((trans, index) => {
-
                 sales += parseFloat(trans.total);
+
+
                 transact++;
 
 
 
                 trans.items.forEach(item => {
+                    subProfit += item.profit * item.quantity;
+
                     sold_items.push(item);
                 });
+                totalProfit += subProfit;
 
 
                 if (!tills.includes(trans.till)) {
@@ -1974,20 +2022,20 @@ function loadTransactions() {
                 transaction_list += `<tr>
                                 <td>${trans.order}</td>
                                 <td class="nobr">${moment(trans.date).format('YYYY MMM DD hh:mm:ss')}</td>
-                                <td>${settings.symbol + trans.total}</td>
-                                <td>${trans.paid == "" ? "" : settings.symbol + trans.paid}</td>
-                                <td>${trans.change ? settings.symbol + Math.abs(trans.change).toFixed(2) : ''}</td>
+                                <td>${trans.total + " " + settings.symbol}</td>
+                                <td>${trans.paid == "" ? "" : trans.paid + " " + settings.symbol}</td>
+                                <td>${trans.change ? Math.abs(trans.change).toFixed(2) + " " + settings.symbol : ''}</td>
                                 <td>${trans.paid == "" ? "" : trans.payment_type == 0 ? "Cash" : 'Card'}</td>
-                                <td>${trans.till}</td>
+                                <td>${subProfit + " " + settings.symbol}</td>
                                 <td>${trans.user}</td>
                                 <td>${trans.paid == "" ? '<button class="btn btn-dark"><i class="fa fa-search-plus"></i></button>' : '<button onClick="$(this).viewTransaction(' + index + ')" class="btn btn-info"><i class="fa fa-search-plus"></i></button></td>'}</tr>
                     `;
-
+                subProfit = 0;
                 if (counter == transactions.length) {
 
-                    $('#total_sales #counter').text(settings.symbol + parseFloat(sales).toFixed(2));
+                    $('#total_sales #counter').text(parseFloat(sales).toFixed(2) + " " + settings.symbol);
                     $('#total_transactions #counter').text(transact);
-
+                    $('#total_profit #counter').text(totalProfit + " " + settings.symbol);
                     const result = {};
 
                     for (const { product_name, price, quantity, id } of sold_items) {
@@ -2032,10 +2080,7 @@ function loadTransactions() {
                         , "info": true
                         , "JQueryUI": true
                         , "ordering": true
-                        , "paging": true,
-                        "dom": 'Bfrtip',
-                        "buttons": ['csv', 'excel', 'pdf',]
-
+                        , "paging": true
                     });
                 }
             });
@@ -2074,7 +2119,6 @@ function loadSoldProducts() {
     $('#product_sales').empty();
 
     sold.forEach((item, index) => {
-
         items += item.qty;
         products++;
 
@@ -2088,7 +2132,7 @@ function loadSoldProducts() {
             <td>${item.product}</td>
             <td>${item.qty}</td>
             <td>${product[0].stock == 1 ? product.length > 0 ? product[0].quantity : '' : 'N/A'}</td>
-            <td>${settings.symbol + (item.qty * parseFloat(item.price)).toFixed(2)}</td>
+            <td>${(item.qty * parseFloat(item.price)).toFixed(2) + " " + settings.symbol}</td>
             </tr>`;
 
         if (counter == sold.length) {
@@ -2141,7 +2185,7 @@ $.fn.viewTransaction = function (index) {
     let products = allTransactions[index].items;
 
     products.forEach(item => {
-        items += "<tr><td>" + item.product_name + "</td><td>" + item.quantity + "</td><td>" + settings.symbol + parseFloat(item.price).toFixed(2) + "</td></tr>";
+        items += "<tr><td>" + item.product_name + "</td><td>" + item.quantity + "</td><td>" + parseFloat(item.price).toFixed(2) + " " + settings.symbol + "</td></tr>";
 
     });
 
@@ -2160,12 +2204,12 @@ $.fn.viewTransaction = function (index) {
         payment = `<tr>
                     <td>Paid</td>
                     <td>:</td>
-                    <td>${settings.symbol + allTransactions[index].paid}</td>
+                    <td>${allTransactions[index].paid + " " + settings.symbol}</td>
                 </tr>
                 <tr>
                     <td>Change</td>
                     <td>:</td>
-                    <td>${settings.symbol + Math.abs(allTransactions[index].change).toFixed(2)}</td>
+                    <td>${Math.abs(allTransactions[index].change).toFixed(2) + " " + settings.symbol}</td>
                 </tr>
                 <tr>
                     <td>Method</td>
@@ -2180,7 +2224,7 @@ $.fn.viewTransaction = function (index) {
         tax_row = `<tr>
                 <td>Vat(${settings.percentage})% </td>
                 <td>:</td>
-                <td>${settings.symbol}${parseFloat(allTransactions[index].tax).toFixed(2)}</td>
+                <td>${parseFloat(allTransactions[index].tax).toFixed(2)} ${settings.symbol}</td>
             </tr>`;
     }
 
@@ -2221,12 +2265,12 @@ $.fn.viewTransaction = function (index) {
         <tr>                        
             <td><b>Subtotal</b></td>
             <td>:</td>
-            <td><b>${settings.symbol}${allTransactions[index].subtotal}</b></td>
+            <td><b>${allTransactions[index].subtotal} ${settings.symbol}</b></td>
         </tr>
         <tr>
             <td>Discount</td>
             <td>:</td>
-            <td>${discount > 0 ? settings.symbol + parseFloat(allTransactions[index].discount).toFixed(2) : ''}</td>
+            <td>${discount > 0 ? parseFloat(allTransactions[index].discount).toFixed(2) + " " + settings.symbol : ''}</td>
         </tr>
         
         ${tax_row}
@@ -2235,7 +2279,7 @@ $.fn.viewTransaction = function (index) {
             <td><h3>Total</h3></td>
             <td><h3>:</h3></td>
             <td>
-                <h3>${settings.symbol}${allTransactions[index].total}</h3>
+                <h3>${allTransactions[index].total} ${settings.symbol}</h3>
             </td>
         </tr>
         ${payment == 0 ? '' : payment}

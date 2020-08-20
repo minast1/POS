@@ -1,3 +1,4 @@
+
 # Store Point of Sale
  Desktop Point of Sale app built with electron
  
@@ -15,26 +16,27 @@
 - Filter Transactions by Till, Cashier or Status. 
 - Filter Transactions by Date Range. 
 
- **To use on Windows:**
- [Download](http://www.storepointofsale.com/download/v1/StorePOS.msi) the MSI Installer
+**Features Added to the original version :**
 
-  **Looking for a Desktop Invoicing app?**
-  
- Check out the [Offline Invoicing](https://github.com/tngoman/Offline_Invoicing) app for freelancers.
+- Custom barcode  
+- Product Expiry date 
+- Calculate profit per item and total profit
+- Alert for expiration date
+- New styling and fix display issues  
 
-**To Customize/Create your own installer**
+
 
 - Clone this project.
 - Open terminal and navigate into the cloned folder.
 - Run "npm install" to install dependencies.
 - Run "npm run electron". 
 
-![POS](https://github.com/tngoman/Store-POS/blob/master/screenshots/pos.jpg)
+![POS](https://github.com/ailakhdar/Store-POS/screenshots/2.jpg)
 
-![Transactions](https://github.com/tngoman/Store-POS/blob/master/screenshots/transactions.jpg)
+![Transactions](https://github.com/ailakhdar/Store-POS/screenshots/transaction.jpg)
 
-![Receipt](https://github.com/tngoman/Store-POS/blob/master/screenshots/receipt.jpg)
+![Receipt](https://github.com/ailakhdar/Store-POS/screenshots/5.jpg)
 
-![Permissions](https://github.com/tngoman/Store-POS/blob/master/screenshots/permissions.jpg)
+![Permissions](https://github.com/ailakhdar/Store-POS/screenshots/4.jpg)
 
-![Users](https://github.com/tngoman/Store-POS/blob/master/screenshots/users.jpg)
+![Users](https://github.com/ailakhdar/Store-POS/screenshots/alert.jpg)
