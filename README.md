@@ -25,11 +25,11 @@
 - New styling and fix display issues  
 
 
-
+**Usage**
 - Clone this project.
 - Open terminal and navigate into the cloned folder.
-- Run "npm install" to install dependencies.
-- Run "npm run electron". 
+- Run "npm install"to install dependencies.
+- Run "npm run electron".
 
 ![Screenshot 1](https://github.com/ailakhdar/Store-POS/blob/master/screenshots/2.jpg)
 
