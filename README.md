@@ -15,9 +15,6 @@
 - Transaction History. 
 - Filter Transactions by Till, Cashier or Status. 
 - Filter Transactions by Date Range. 
-
-**Features Added to the original version :**
-
 - Custom barcode  
 - Product Expiry date 
 - Calculate profit per item and total profit
